@@ -7,11 +7,7 @@ async function emailTemplate(
   this: Search,
   data: testDataType
 ): Promise<string> {
-  const { pageInfo = [], imgBase64 = '' } = data;
-
-  const ImgDom = imgBase64
-    ? `<div class="pagesImg"><img src="${imgBase64}"/></div>`
-    : '';
+  const { pageInfo = [] } = data;
 
   const { commit } = this.outputJson;
 
@@ -25,7 +21,7 @@ async function emailTemplate(
 
   const [weight1, weight2] = this.weight;
 
-  const getPageStr = (data) => {
+  const getPageStr = data => {
     let { entry, md = '', weight = 0 } = data;
 
     let html = '';
@@ -72,9 +68,9 @@ async function emailTemplate(
       };
     })();
 
-    const styleStr = (style) => {
+    const styleStr = style => {
       return Object.keys(style)
-        .map((key) => `${key}:${style[key]};`)
+        .map(key => `${key}:${style[key]};`)
         .join('');
     };
 
@@ -117,7 +113,7 @@ async function emailTemplate(
     `;
   };
 
-  let pages = pageInfoData.map((data) => getPageStr(data)).join('');
+  let pages = pageInfoData.map(data => getPageStr(data)).join('');
 
   if (pages.length === 0) {
     pages =
@@ -182,14 +178,6 @@ async function emailTemplate(
           margin: 5px 0;
           overflow: hidden;
           border-radius: 10px;
-        }
-
-        .pagesImg{
-          width: 100%;
-        }
-
-        .pagesImg img{
-          width: 100%;
         }
 
         .md-btn-box {
@@ -459,14 +447,6 @@ async function emailTemplate(
             </mj-text>
           </mj-column>
         </mj-section>
-
-        <mj-section padding="0">
-          <mj-column>
-            <mj-text>
-              ${ImgDom}
-            </mj-text>
-          </mj-column>
-       </mj-section>
 
       </mj-wrapper>
     </mj-body>

@@ -1,22 +1,6 @@
 <template>
   <div id="all-box">
     <el-tabs tab-position="left" v-if="garbageData">
-      <el-tab-pane label="树形">
-        <div class="tab-pane-box">
-          <el-tree
-            :data="garbageData.tree"
-            :props="defaultProps"
-            ref="tree_garbage"
-            id="tree_garbage"
-            :load="loadNode_isGarbage({ id: 'tree_garbage' })"
-            lazy
-            @node-click="handleNodeClickGarbage"
-            :render-after-expand="false"
-          >
-          </el-tree>
-          <TreeMap :data="garbageData.tree" />
-        </div>
-      </el-tab-pane>
       <el-tab-pane label="平铺">
         <div class="tab-pane-box">
           <el-collapse accordion>
@@ -67,6 +51,21 @@
           </el-collapse>
         </div>
       </el-tab-pane>
+      <el-tab-pane label="树形">
+        <div class="tab-pane-box">
+          <el-tree
+            :data="garbageData.tree"
+            :props="defaultProps"
+            ref="tree_garbage"
+            id="tree_garbage"
+            :load="loadNode_isGarbage({ id: 'tree_garbage' })"
+            lazy
+            @node-click="handleNodeClickGarbage"
+            :render-after-expand="false"
+          >
+          </el-tree>
+        </div>
+      </el-tab-pane>
     </el-tabs>
 
     <el-dialog title="引用者" v-model="alertGarbage.show" width="70%">
@@ -100,10 +99,8 @@
 <script setup lang="ts">
 import { ElLoading } from 'element-plus';
 import { ref, reactive } from 'vue';
-import _ from 'lodash';
 import { axiosGarbage } from '@/api';
 import { loadNode_isGarbage, dblclickOpenIde, openIde } from '@/util';
-import TreeMap from './TreeMap.vue';
 
 const garbageData = ref<WasteDataType | null>(null);
 
@@ -168,16 +165,8 @@ const getGarbageData = async () => {
 getGarbageData();
 </script>
 
-<style scoped>
+<style>
 .container {
   padding: 0 50px 0;
-}
-.Canvas {
-  width: 100%;
-  height: 100%;
-}
-.CanvasBox {
-  width: 100%;
-  height: calc(100vh - 140px);
 }
 </style>

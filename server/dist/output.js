@@ -25,9 +25,6 @@ function output(option) {
         const date = new Date();
         const Json = {
             projectName: this.packageJson.name,
-            pagesFileEntry: this.pagesFileEntry.map((item) => {
-                return Object.assign(Object.assign({}, item), { path: this.deletePrefix(item.path) });
-            }),
             branch: this.branch,
             iwork: this.iwork,
             iworkId: this.iworkId,

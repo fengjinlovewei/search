@@ -41,8 +41,11 @@ const server_1 = require("./server");
 const launchEditor_1 = require("./launchEditor");
 const testInfo_1 = require("./email/EmailTemplate/testInfo");
 const setIworkData_1 = require("./setIworkData");
+const trackLog_1 = require("./trackLog");
+const getPrimitive_1 = require("./getPrimitive");
 const util_1 = require("./util");
 const common_1 = require("./common");
+const parser_1 = require("@babel/parser");
 class Search {
     constructor(options) {
         this.dataError = new Set(); // 错误的引入路径信息，检查导入的路径超出检索范围;
@@ -54,16 +57,29 @@ class Search {
         this.iworkId = ''; // iwork 地址
         this.spinner = (0, ora_1.default)();
         this.root = process.cwd(); // 项目入口
+        this.middleserverIP = 'http://buluo.58v5.cn'; // 这块现在都改成域名了，需要配置开发环境的话，需要修改本地的hosts文件，做映射
         this.commitItem = ['%H', '%T', '%P', '%cn', '%ce', '%cd', '%s'];
         this.userDataPath = path_1.default.resolve(__dirname, '../local_data/user.json');
+        this.trackLogDocsHtmlPath = path_1.default.resolve(__dirname, '../docs');
         this.commit = {};
         this.allCommitData = [];
-        this.parsed = {};
+        this.parsed = null;
         this.changeFiles = [];
         this.changePagesJson = {};
         this.changePagesJsonFull = {};
         this.scopeData = [];
         this.entryFileCacheJson = {}; // 入口文件的 search.json 的缓存数据
+        // @babel/parser 的参数配置
+        this.babelParserConfig = {
+            sourceType: 'module',
+            plugins: [
+                'jsx',
+                'typescript',
+                'decorators-legacy',
+                'exportDefaultFrom',
+                'importAssertions',
+            ],
+        };
         /**
          * 这一部分是动态挂载的原型方法
          */
@@ -79,14 +95,28 @@ class Search {
         this.getScope = scope_1.getScope;
         this.emailTemplate = testInfo_1.emailTemplate;
         this.setIworkData = setIworkData_1.setIworkData;
+        this.trackLog = trackLog_1.trackLog;
+        this.getImportNamespace = getPrimitive_1.getImportNamespace;
+        this.getExportIdentifier = getPrimitive_1.getExportIdentifier;
+        this.getIdentifier = getPrimitive_1.getIdentifier;
+        this.getMemberExpression = getPrimitive_1.getMemberExpression;
+        this.getPrimitive = getPrimitive_1.getPrimitive;
         /**
-         * 生么样的方法挂载到原型上？
+         * 什么样的方法挂载到原型上？
          * 函数内部依赖 this 数据的，挂载到class上
          * 不依赖的，放到 util.ts  文件中
          */
         this.getDependencies = () => {
             const { dependencies = {} } = this.packageJson;
             return Object.keys(dependencies);
+        };
+        this.getAst = (fullPath) => {
+            if (this.astCache.has(fullPath)) {
+                return this.astCache.get(fullPath);
+            }
+            const ast = this.babelParse(fullPath);
+            this.astCache.set(fullPath, ast);
+            return ast;
         };
         this.log = (test) => {
             console.log(test);
@@ -122,6 +152,22 @@ class Search {
         // 去掉路径前缀
         this.deletePrefix = (data) => {
             return this._prefix(data, 'delete');
+        };
+        // 删除文件或文件夹
+        this.delFile = (file) => {
+            if (fs_1.default.existsSync(file)) {
+                //如果是文件夹
+                if (fs_1.default.statSync(file).isDirectory()) {
+                    fs_1.default.readdirSync(file).forEach((item) => {
+                        const curPath = path_1.default.join(file, item);
+                        this.delFile(curPath); //递归删除
+                    });
+                    fs_1.default.rmdirSync(file); // 删除文件夹
+                }
+                else {
+                    fs_1.default.unlinkSync(file); //删除文件
+                }
+            }
         };
         // 判断是不是node_modules里的宝宝
         this.filterNodeModules = (url) => {
@@ -166,24 +212,28 @@ class Search {
             const pagesFileEntryPath = this.pagesFileEntry.map((item) => item.path);
             if (pagesFileEntryPath.includes(file)) {
                 // 这段代码相当于去重数据
-                if (!this.entryFileCacheJson[file]) {
-                    // 获取和入口文件平行的 .md 文件 的数据
-                    const MDPath = this.getMD(file);
-                    let md = '';
-                    try {
-                        md = fs_1.default.readFileSync(MDPath, 'utf-8');
-                    }
-                    catch (e) { }
-                    const data = {
-                        md,
-                        entry: this.deletePrefix(file),
-                    };
-                    this.entryFileCacheJson[file] = data;
-                    return data;
+                if (this.entryFileCacheJson[file])
+                    return this.entryFileCacheJson[file];
+                // 获取和入口文件平行的 .md 文件 的数据
+                const MDPath = this.getMD(file);
+                let md = '';
+                try {
+                    md = fs_1.default.readFileSync(MDPath, 'utf-8');
                 }
-                return this.entryFileCacheJson[file];
+                catch (e) { }
+                const data = {
+                    md,
+                    entry: this.deletePrefix(file),
+                };
+                this.entryFileCacheJson[file] = data;
+                return data;
             }
             return false;
+        };
+        this.babelParse = (fullPath) => {
+            const code = fs_1.default.readFileSync(fullPath, 'utf-8');
+            // 生成语法树
+            return (0, parser_1.parse)(code, this.babelParserConfig);
         };
         // 递归路径
         this.forFile = (children) => {
@@ -195,7 +245,8 @@ class Search {
                         this.forFile(children);
                     }
                     else {
-                        this.filterPath({ item });
+                        // 不存在 children 属性，就说明是一个文件
+                        this.filterPath({ item: item });
                     }
                 });
             }
@@ -207,10 +258,10 @@ class Search {
                 try {
                     this.spinner.start(`${message}...`);
                     yield func();
-                    this.spinner.succeed(`${message}完成`);
+                    this.spinner.succeed(`${message}完成！`);
                 }
                 catch (e) {
-                    this.spinner.fail(`${message}失败`);
+                    this.spinner.fail(`${message}出错！`);
                     console.log('\n');
                     console.log(e);
                     console.log('\n');
@@ -221,6 +272,7 @@ class Search {
         });
         // 没病走两步？
         this.run = () => __awaiter(this, void 0, void 0, function* () {
+            console.log(process.env.NODE_ENV);
             const { goon, modules } = yield inquirer_1.default.prompt([
                 {
                     type: 'list',
@@ -257,7 +309,7 @@ class Search {
             { reg: /\.(ts|js)$/, weight: 2 },
             { reg: /\.(jsx|tsx)$/, weight: 10 },
         ], iworkExcPaths = [], // iwork分析师要排除的路径前缀
-        iworkCallback = null, gitLog = '--after="2021-01-01"', } = options;
+        iworkCallback = null, gitLog = '--after="2021-01-01"', globalFunction = {}, debug = false, } = options;
         this.port = port; // 启动服务的端口号
         this.alias = alias; // 这个特殊，不能用this.addPrefix自动填充路径前缀，因为neighbourhood特殊
         this.weight = weight; //分析等级分级
@@ -265,6 +317,8 @@ class Search {
         this.iworkExcPaths = this.addPrefix(iworkExcPaths);
         this.iworkCallback = iworkCallback;
         this.gitLog = gitLog;
+        this.debug = debug;
+        this.globalFunction = globalFunction;
         // 引用的第三包集合
         this.dependencies = dependencies;
         // 存放生成的记录文件路径
@@ -291,6 +345,7 @@ class Search {
             .flat();
         // 入口文件列表
         this.pagesFileEntry = this.addPrefix(pagesFileEntry);
+        this.astCache = new Map();
         // 模块组
         this.runModules = {
             pullMater: {
@@ -362,8 +417,12 @@ class Search {
                 func: () => this.server(),
             },
             setIworkData: {
-                message: '入口 README.md 注入历史相关需求',
+                message: '注入历史相关需求',
                 func: () => this.setIworkData(),
+            },
+            trackLog: {
+                message: '生成埋点文档',
+                func: () => this.trackLog(),
             },
         };
         // 拼装模块
@@ -388,6 +447,15 @@ class Search {
                     this.runModules.formatFiles,
                     this.runModules.getEntryScope,
                     this.runModules.setIworkData,
+                ],
+            },
+            {
+                name: '生成埋点文档',
+                value: [
+                    //this.runModules.pullMater,
+                    this.runModules.creatFileTree,
+                    this.runModules.formatFiles,
+                    this.runModules.trackLog,
                 ],
             },
         ];

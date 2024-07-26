@@ -7,7 +7,7 @@ const development = {
 
 const production = {
   rootURL: '',
-  middleNodeURL: 'http://10.146.84.35:1991',
+  middleNodeURL: 'http://buluo.58v5.cn',
 };
 
 const apiConfig = debug ? development : production;

@@ -1,0 +1,1 @@
+(window.webpackJsonp=window.webpackJsonp||[]).push([[8],{277:function(s,t,i){"use strict";i.r(t);var n={props:["list"]},l=i(14),e=Object(l.a)(n,(function(){return(0,this._self._c)("div",[this._v("\n  hello!!!"+this._s(this.list.os)+"\n  "),this._t("default")],2)}),[],!1,null,"4334bc94",null);t.default=e.exports}}]);

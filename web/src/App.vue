@@ -60,7 +60,11 @@ div.el-collapse-item__content {
   font-size: 16px;
 }
 
-.searc-type {
+.util-box-header {
+  display: flex;
+}
+
+.search-type {
   width: 200px;
 }
 

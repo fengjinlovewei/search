@@ -15,6 +15,12 @@ declare namespace C {
   export type iworkCallback = null | ((data: EntryIworkType) => void);
   export type weightFile = weightFileType[];
   export type gitLog = string;
+  export type debug = boolean;
+  export type globalFunction = globalFunctionType;
+}
+
+declare interface globalFunctionType {
+  [x: string]: (...any) => any;
 }
 
 declare interface TabType {
@@ -36,8 +42,44 @@ declare interface PathObj extends Obj {
   path: string;
 }
 
+declare interface ImportSpecifierItemType {
+  currentName: string;
+  originName: string;
+}
+
+declare interface MAPChildrenAllType {
+  fullPath: string;
+  ImportDefaultSpecifier: string | null;
+  ImportSpecifier: ImportSpecifierItemType[];
+  ImportNamespaceSpecifier: string | null;
+  // 没这个写法 ，虽然babel可以编译 export eee from 'xxx';
+  // 只有 export { default } from 'xxx'; 这个写法
+  // ExportDefaultSpecifier: string | null;
+  ExportSpecifier: ImportSpecifierItemType[];
+  ExportNamespaceSpecifier: string | null;
+  ExportAllDeclaration: boolean;
+}
+
+declare interface getExportIdentifierType {
+  type: keyof Pick<
+    MAPChildrenAllType,
+    'ImportDefaultSpecifier' | 'ImportSpecifier' | 'ImportNamespaceSpecifier'
+  >;
+  name: string;
+  fullPath: MAPChildrenAllType['fullPath'];
+}
+
+declare interface getImportNamespaceType {
+  // type: keyof Pick<
+  //   MAPChildrenAllType,
+  //   'ExportSpecifier' | 'ExportNamespaceSpecifier' | 'ExportAllDeclaration'
+  // >;
+  fullPath: MAPChildrenAllType['fullPath'];
+}
+
 declare interface MAPDataType {
   children: string[];
+  all: MAPChildrenAllType[];
   $cited: string[];
 }
 
@@ -54,6 +96,7 @@ declare type PrefixType =
 declare interface pagesFileDataType {
   path: string;
   weight?: number | string;
+  page?: number | string;
   pv?: number;
 }
 
@@ -193,7 +236,6 @@ declare interface PathMergeParamType {
 
 declare interface PathMergeItemType {
   label: string;
-  name: string;
   path?: string;
   children: Array<PathMergeItemType>;
 }
@@ -235,6 +277,8 @@ declare interface Options {
   iworkCallback?: C.iworkCallback;
   weightFile?: C.weightFile;
   gitLog?: C.gitLog;
+  debug?: C.debug;
+  globalFunction?: C.globalFunction;
 }
 
 declare interface NotUseJsonFullType {
@@ -260,7 +304,6 @@ declare interface WasteDataType {
 
 declare interface OutputJsonType {
   branch: string;
-  pagesFileEntry: Options['pagesFileEntry'];
   iwork: string;
   iworkId: string;
   commit: Obj;
@@ -297,7 +340,7 @@ declare interface userDataType {
   toUserList?: Array<string>;
 }
 
-declare interface testDataType extends setEmailTemplateRequest {
+declare interface testDataType {
   pageInfo: Array<Obj>;
 }
 
@@ -317,10 +360,6 @@ declare interface responseCommon {
 
 declare interface indexDataResponse extends responseCommon {
   data: OutputJsonType;
-}
-
-declare interface setEmailTemplateRequest {
-  imgBase64?: string;
 }
 declare interface emailTemplateResponse extends responseCommon {
   data: string;
@@ -370,10 +409,42 @@ declare interface setExportRequest<T = any> {
 declare interface setExportResponse extends responseCommon {
   data: {
     tree: treeType;
-    // pagesFileEntry: Options['pagesFileEntry'];
   };
 }
 
 declare interface setGarbageResponse extends responseCommon {
   data: WasteDataType;
 }
+
+/**
+ * middleserver
+ */
+
+declare interface tracklogCommon {
+  os: string;
+  ua58: string;
+  projectName: string;
+  page: string;
+  trackName: string;
+  pagetype: string;
+  actiontype: string;
+  realtime: boolean;
+}
+declare interface tracklogRequest extends tracklogCommon {
+  paramsArray: any[];
+  paramsJson: object;
+}
+
+declare interface tracklogSQL extends tracklogCommon {
+  id: string;
+  paramsArray: string;
+  paramsJson: string;
+}
+
+type DeepPartial<T> = T extends Function
+  ? T
+  : T extends object
+  ? { [P in keyof T]?: DeepPartial<T[P]> }
+  : T;
+
+type tracklogSQLSearch = DeepPartial<tracklogSQL>; // 现在window 上所有属性都变成了可选啦

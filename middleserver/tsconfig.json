@@ -12,7 +12,8 @@
     "baseUrl": "./",
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
-    "experimentalDecorators": true
+    "experimentalDecorators": true,
+    "sourceMap": true
   },
   "include": ["./src", "./global.d.ts"],
   "ts-node": {

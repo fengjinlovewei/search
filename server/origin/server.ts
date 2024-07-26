@@ -226,10 +226,7 @@ async function server(this: Search) {
         changePagesJsonFull: changePagesJsonFull,
         interfaceClose,
       });
-      ctx.body = {
-        code: 0,
-        data: Json,
-      };
+      ctx.body = { code: 0, data: Json };
     } catch (e) {
       ctx.body = { code: 0, data: null };
     }
@@ -253,27 +250,16 @@ async function server(this: Search) {
       };
     });
 
-    ctx.body = {
-      code: 0,
-      data: {
-        tree,
-        // pagesFileEntry: this.pagesFileEntry.map((item) => {
-        //   return { ...item, path: this.deletePrefix(item.path) };
-        // }),
-      },
-    };
+    ctx.body = { code: 0, data: { tree } };
   });
 
   // 返回对应邮件的模板
-  router.post('/emailTemplate', async (ctx: ctxType<emailTemplateResponse>) => {
-    const { imgBase64 } = ctx.request.body as setEmailTemplateRequest;
-
+  router.get('/emailTemplate', async (ctx: ctxType<emailTemplateResponse>) => {
     const pageInfo = getWeight();
 
     if (typeof this.emailTemplate === 'function') {
       const data = await this.emailTemplate({
         pageInfo,
-        imgBase64,
       });
 
       ctx.body = { code: 0, data };

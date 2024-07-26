@@ -1,7 +1,7 @@
 ---
 title: （示例：h5帖子详情页）
 description: （示例：用于展示部落帖子和第三方抓取内容的页面）
-rating: （示例：*****）
+rating: （示例：★★★★★）
 deprecated: （示例：false）
 ---
 

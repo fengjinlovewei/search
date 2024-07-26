@@ -18,10 +18,7 @@ const lodash_1 = __importDefault(require("lodash"));
 const util_1 = require("../../util");
 function emailTemplate(data) {
     return __awaiter(this, void 0, void 0, function* () {
-        const { pageInfo = [], imgBase64 = '' } = data;
-        const ImgDom = imgBase64
-            ? `<div class="pagesImg"><img src="${imgBase64}"/></div>`
-            : '';
+        const { pageInfo = [] } = data;
         const { commit } = this.outputJson;
         const pageInfoData = [...pageInfo];
         pageInfoData.sort((a, b) => b.weight - a.weight);
@@ -29,7 +26,7 @@ function emailTemplate(data) {
         const c2 = '#f7a605';
         const c3 = '#3399ff';
         const [weight1, weight2] = this.weight;
-        const getPageStr = (data) => {
+        const getPageStr = data => {
             let { entry, md = '', weight = 0 } = data;
             let html = '';
             const { head } = (0, util_1.mdParse)(md);
@@ -69,9 +66,9 @@ function emailTemplate(data) {
                     },
                 };
             })();
-            const styleStr = (style) => {
+            const styleStr = style => {
                 return Object.keys(style)
-                    .map((key) => `${key}:${style[key]};`)
+                    .map(key => `${key}:${style[key]};`)
                     .join('');
             };
             if (!isMD) {
@@ -108,7 +105,7 @@ function emailTemplate(data) {
       </div>
     `;
         };
-        let pages = pageInfoData.map((data) => getPageStr(data)).join('');
+        let pages = pageInfoData.map(data => getPageStr(data)).join('');
         if (pages.length === 0) {
             pages =
                 '<div style="font-size:20px;font-weight: bold;">没有收集到依赖页面！</div>';
@@ -171,14 +168,6 @@ function emailTemplate(data) {
           margin: 5px 0;
           overflow: hidden;
           border-radius: 10px;
-        }
-
-        .pagesImg{
-          width: 100%;
-        }
-
-        .pagesImg img{
-          width: 100%;
         }
 
         .md-btn-box {
@@ -440,14 +429,6 @@ function emailTemplate(data) {
             </mj-text>
           </mj-column>
         </mj-section>
-
-        <mj-section padding="0">
-          <mj-column>
-            <mj-text>
-              ${ImgDom}
-            </mj-text>
-          </mj-column>
-       </mj-section>
 
       </mj-wrapper>
     </mj-body>

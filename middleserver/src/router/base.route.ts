@@ -1,9 +1,9 @@
 import Router from 'koa-router';
-import { sendEmail } from '../controller/base.controller';
+import { indexPage } from '../controller/base.controller';
 
-const route = new Router({ prefix: '/base' });
+const route = new Router({ prefix: '/' });
 
 //route.post('/rootData', rootData);
-route.post('/sendEmail', sendEmail);
+route.get('/', indexPage);
 
 export default route;

@@ -25,9 +25,6 @@ async function output(this: Search, option: outputOption) {
 
   const Json: OutputJsonType = {
     projectName: this.packageJson.name,
-    pagesFileEntry: this.pagesFileEntry.map((item) => {
-      return { ...item, path: this.deletePrefix(item.path) };
-    }),
     branch: this.branch,
     iwork: this.iwork,
     iworkId: this.iworkId,

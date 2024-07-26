@@ -15,6 +15,12 @@ const meishiBaseUrl = 'http://openapi.mism.58dns.org';
 /**
  * @see http://wbook.58corp.com/books/meishi/sendMessage/sendMsg-http.html
  */
+
+declare interface SendGroupMsgMeishiType {
+  text: string;
+  toId?: string;
+}
+
 export async function sendGroupMsgMeishi({
   text,
   toId = '81466',

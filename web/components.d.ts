@@ -29,13 +29,12 @@ declare module '@vue/runtime-core' {
     ElUpload: typeof import('element-plus/es')['ElUpload']
     Email: typeof import('./src/components/Email.vue')['default']
     Header: typeof import('./src/components/Header.vue')['default']
+    HighchartsContent: typeof import('./src/components/HighchartsContent.vue')['default']
     Home: typeof import('./src/components/Home.vue')['default']
     Info: typeof import('./src/components/Info.vue')['default']
     Loading: typeof import('element-plus/es')['ElLoadingDirective']
-    RelationMap: typeof import('./src/components/RelationMap.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
-    TreeMap: typeof import('./src/components/TreeMap.vue')['default']
     Util: typeof import('./src/components/Util.vue')['default']
   }
 }

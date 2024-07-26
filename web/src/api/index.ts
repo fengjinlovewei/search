@@ -16,10 +16,8 @@ export function axiosIndexData(): Promise<indexDataResponse> {
   return rootJSON.get('/indexData');
 }
 
-export function axiosEmailTemplate({
-  imgBase64,
-}: setEmailTemplateRequest): Promise<emailTemplateResponse> {
-  return rootJSON.post('/emailTemplate', { imgBase64 });
+export function axiosEmailTemplate(): Promise<emailTemplateResponse> {
+  return rootJSON.get('/emailTemplate');
 }
 
 export function axiosGetHistory(): Promise<getHistoryResponse> {
@@ -63,5 +61,5 @@ export function axiosGarbage(): Promise<setGarbageResponse> {
  */
 
 export function axiosSendEmail(data: any): Promise<sendEmailResponse> {
-  return middleNodeJSON.post('/base/sendEmail', data);
+  return middleNodeJSON.post('/email/send', data);
 }

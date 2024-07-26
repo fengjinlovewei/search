@@ -1,0 +1,1 @@
+(window.webpackJsonp=window.webpackJsonp||[]).push([[8],{278:function(n,t,s){"use strict";s.r(t);var e={props:["list"]},l=s(14),i=Object(l.a)(e,(function(){var n=this,t=n._self._c;return t("div",[n._v("\n  hello!!!\n  "),n._l(n.list,(function(s){return t("div",[n._v(n._s(s.os))])})),n._v(" "),n._t("default")],2)}),[],!1,null,"4c26526e",null);t.default=i.exports}}]);

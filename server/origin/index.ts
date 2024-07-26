@@ -1,4 +1,5 @@
 import dirParser from 'dir-parser';
+import type { Parsed, FileInfo, DirInfo } from 'dir-parser';
 import path from 'path';
 import fs from 'fs';
 import inquirer from 'inquirer';
@@ -17,9 +18,20 @@ import { server } from './server';
 import { launchEditor } from './launchEditor';
 import { emailTemplate } from './email/EmailTemplate/testInfo';
 import { setIworkData } from './setIworkData';
+import { trackLog } from './trackLog';
+import {
+  getImportNamespace,
+  getExportIdentifier,
+  getIdentifier,
+  getMemberExpression,
+  getPrimitive,
+} from './getPrimitive';
 
 import { RunCommand, getType } from './util';
 import { typeList } from './common';
+import { parse } from '@babel/parser';
+import type { ParserOptions, ParseResult } from '@babel/parser';
+import type { File } from '@babel/types';
 
 // 注意：依赖引用不是树结构，比如b和c都引用了a，并且b和c之间又相互引用，这就不是一个树
 interface RunItem {
@@ -58,12 +70,14 @@ export default class Search {
   spinner = ora();
   mode: Array<ModeType>;
   root: string = process.cwd(); // 项目入口
+  middleserverIP: string = 'http://buluo.58v5.cn'; // 这块现在都改成域名了，需要配置开发环境的话，需要修改本地的hosts文件，做映射
 
   commitItem: CommitItemType = ['%H', '%T', '%P', '%cn', '%ce', '%cd', '%s'];
   userDataPath: string = path.resolve(__dirname, '../local_data/user.json');
+  trackLogDocsHtmlPath = path.resolve(__dirname, '../docs');
   commit: Obj = {};
   allCommitData: Array<commitDataType> = [];
-  parsed: Obj = {};
+  parsed: Parsed | null = null;
   changeFiles: ChangeFilesType = [];
   changePagesJson: ChangePagesJsonType = {};
   changePagesJsonFull: ChangePagesJsonFullType = {};
@@ -95,6 +109,21 @@ export default class Search {
   iworkExcPaths: C.iworkExcPaths;
   iworkCallback: C.iworkCallback;
   gitLog: C.gitLog;
+  debug: C.debug;
+  globalFunction: C.globalFunction;
+  astCache: Map<string, ParseResult<File>>;
+
+  // @babel/parser 的参数配置
+  babelParserConfig: ParserOptions = {
+    sourceType: 'module',
+    plugins: [
+      'jsx',
+      'typescript',
+      'decorators-legacy',
+      'exportDefaultFrom',
+      'importAssertions',
+    ],
+  };
 
   constructor(options: Options) {
     const {
@@ -117,6 +146,8 @@ export default class Search {
       iworkExcPaths = [], // iwork分析师要排除的路径前缀
       iworkCallback = null,
       gitLog = '--after="2021-01-01"',
+      globalFunction = {},
+      debug = false,
     }: Options = options;
 
     this.port = port; // 启动服务的端口号
@@ -126,6 +157,8 @@ export default class Search {
     this.iworkExcPaths = this.addPrefix(iworkExcPaths);
     this.iworkCallback = iworkCallback;
     this.gitLog = gitLog;
+    this.debug = debug;
+    this.globalFunction = globalFunction;
 
     // 引用的第三包集合
     this.dependencies = dependencies;
@@ -154,6 +187,8 @@ export default class Search {
       .flat();
     // 入口文件列表
     this.pagesFileEntry = this.addPrefix(pagesFileEntry);
+
+    this.astCache = new Map<string, ParseResult<File>>();
 
     // 模块组
     this.runModules = {
@@ -230,8 +265,12 @@ export default class Search {
         func: () => this.server(),
       },
       setIworkData: {
-        message: '入口 README.md 注入历史相关需求',
+        message: '注入历史相关需求',
         func: () => this.setIworkData(),
+      },
+      trackLog: {
+        message: '生成埋点文档',
+        func: () => this.trackLog(),
       },
     };
 
@@ -257,6 +296,15 @@ export default class Search {
           this.runModules.formatFiles,
           this.runModules.getEntryScope,
           this.runModules.setIworkData,
+        ],
+      },
+      {
+        name: '生成埋点文档',
+        value: [
+          //this.runModules.pullMater,
+          this.runModules.creatFileTree,
+          this.runModules.formatFiles,
+          this.runModules.trackLog,
         ],
       },
     ];
@@ -285,6 +333,13 @@ export default class Search {
   getScope = getScope;
   emailTemplate = emailTemplate;
   setIworkData = setIworkData;
+  trackLog = trackLog;
+
+  getImportNamespace = getImportNamespace;
+  getExportIdentifier = getExportIdentifier;
+  getIdentifier = getIdentifier;
+  getMemberExpression = getMemberExpression;
+  getPrimitive = getPrimitive;
 
   get userData(): userDataType {
     let userDataJson = {};
@@ -313,7 +368,7 @@ export default class Search {
   }
 
   /**
-   * 生么样的方法挂载到原型上？
+   * 什么样的方法挂载到原型上？
    * 函数内部依赖 this 数据的，挂载到class上
    * 不依赖的，放到 util.ts  文件中
    */
@@ -321,6 +376,16 @@ export default class Search {
   getDependencies = (): Options['dependencies'] => {
     const { dependencies = {} } = this.packageJson;
     return Object.keys(dependencies);
+  };
+
+  getAst = (fullPath: string): ParseResult<File> => {
+    if (this.astCache.has(fullPath)) {
+      return this.astCache.get(fullPath);
+    }
+
+    const ast = this.babelParse(fullPath);
+    this.astCache.set(fullPath, ast);
+    return ast;
   };
 
   log: Color = (test: string) => {
@@ -369,6 +434,22 @@ export default class Search {
     return this._prefix(data, 'delete');
   };
 
+  // 删除文件或文件夹
+  delFile = (file: string) => {
+    if (fs.existsSync(file)) {
+      //如果是文件夹
+      if (fs.statSync(file).isDirectory()) {
+        fs.readdirSync(file).forEach((item) => {
+          const curPath = path.join(file, item);
+          this.delFile(curPath); //递归删除
+        });
+        fs.rmdirSync(file); // 删除文件夹
+      } else {
+        fs.unlinkSync(file); //删除文件
+      }
+    }
+  };
+
   // 判断是不是node_modules里的宝宝
   filterNodeModules = (url: string): string => {
     // 如果第一个字符是. 说明他不能是npm包
@@ -407,40 +488,46 @@ export default class Search {
   getMD = (file: string): string => path.join(file, '../README.md');
 
   // 判断是不是、是哪个入口文件
-  getPage = (file: string): SearchJsonType | boolean => {
+  getPage = (file: string): SearchJsonType | false => {
     const pagesFileEntryPath = this.pagesFileEntry.map((item) => item.path);
 
     if (pagesFileEntryPath.includes(file)) {
       // 这段代码相当于去重数据
-      if (!this.entryFileCacheJson[file]) {
-        // 获取和入口文件平行的 .md 文件 的数据
-        const MDPath = this.getMD(file);
-        let md = '';
-        try {
-          md = fs.readFileSync(MDPath, 'utf-8');
-        } catch (e) {}
-        const data = {
-          md,
-          entry: this.deletePrefix(file),
-        };
-        this.entryFileCacheJson[file] = data;
-        return data;
-      }
-      return this.entryFileCacheJson[file];
+      if (this.entryFileCacheJson[file]) return this.entryFileCacheJson[file];
+      // 获取和入口文件平行的 .md 文件 的数据
+      const MDPath = this.getMD(file);
+      let md = '';
+      try {
+        md = fs.readFileSync(MDPath, 'utf-8');
+      } catch (e) {}
+      const data = {
+        md,
+        entry: this.deletePrefix(file),
+      };
+      this.entryFileCacheJson[file] = data;
+      return data;
     }
     return false;
   };
 
+  babelParse = (fullPath: string): ParseResult<File> => {
+    const code = fs.readFileSync(fullPath, 'utf-8');
+
+    // 生成语法树
+    return parse(code, this.babelParserConfig);
+  };
+
   // 递归路径
-  forFile = (children) => {
+  forFile = (children: Array<DirInfo | FileInfo>) => {
     if (Array.isArray(children)) {
       children.forEach((item) => {
-        const { children } = item;
+        const { children } = item as DirInfo;
         // 存在 children 属性，就说明是一个文件夹
         if (children) {
           this.forFile(children);
         } else {
-          this.filterPath({ item });
+          // 不存在 children 属性，就说明是一个文件
+          this.filterPath({ item: item as FileInfo });
         }
       });
     }
@@ -453,9 +540,9 @@ export default class Search {
       try {
         this.spinner.start(`${message}...`);
         await func();
-        this.spinner.succeed(`${message}完成`);
+        this.spinner.succeed(`${message}完成！`);
       } catch (e) {
-        this.spinner.fail(`${message}失败`);
+        this.spinner.fail(`${message}出错！`);
         console.log('\n');
         console.log(e);
         console.log('\n');
@@ -467,6 +554,8 @@ export default class Search {
 
   // 没病走两步？
   run = async () => {
+    console.log(process.env.NODE_ENV);
+
     const { goon, modules } = await inquirer.prompt([
       {
         type: 'list',

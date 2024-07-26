@@ -2,8 +2,15 @@
  * @file:
  * @author: fengjin02
  */
+
 import Search from '.';
-// 当前函数确定传入的路径引用了哪些文件，枚举出来返回
+
+/**
+ * 当前函数确定传入的路径引用了哪些文件，枚举出来返回
+ * @param {Class} this Search类
+ * @param {string} p 要分析的文件的完整路径
+ * @param {Boolean} istreeData 是否需要树形结构（这字段是个element树组件渲染用的）
+ */
 function getScope(this: Search, p: string, istreeData: Boolean = true) {
   let Map = this.Map;
 
@@ -12,7 +19,7 @@ function getScope(this: Search, p: string, istreeData: Boolean = true) {
   // 两个变量是为了保证顺序不变，因为对象转化成数组，顺序不能保证
   const children_array: scopeDataType[] = [];
   const children_object = {};
-  const treeData = { label: p, name: p, children: [] };
+  const treeData = { label: p, children: [] };
 
   if (!indexPathData) return { children_array, children_object, treeData };
 
@@ -45,6 +52,7 @@ function getScope(this: Search, p: string, istreeData: Boolean = true) {
     }
   };
 
+  // 如果不需要树结构，可以设置istreeData为false，提升性能
   istreeData && group(treeData);
 
   // 再次创建一个新的纯洁的女体

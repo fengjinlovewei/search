@@ -1,6 +1,8 @@
 import Koa from 'koa';
 import KoaBody from 'koa-body';
 import KoaCors from 'koa2-cors';
+import KoaStatic from 'koa-static';
+import KoaViews from 'koa-views';
 import path from 'path';
 import { scheduleJob } from 'node-schedule';
 
@@ -9,18 +11,25 @@ import { sendGroupMsgMeishi } from '../robot';
 // import '../robot/wx';
 
 import baseRouter from '../router/base.route';
+import emailRouter from '../router/email.route';
 import uploadRouter from '../router/upload.route';
 import githookRouter from '../router/githook.route';
+import tracklogRouter from '../router/tracklog.route';
 
 import { getWeekRecord } from '../schedule/getDayRecord';
 
 const App = new Koa();
+
+//App.use(KoaSslify());
+
+// deleteUpload();
 
 // 处理post请求
 App.use(
   KoaBody({
     multipart: true,
     formidable: {
+      maxFileSize: 100 * 1024 * 1024,
       uploadDir: path.resolve(__dirname, '../upload'),
       keepExtensions: true,
     },
@@ -29,9 +38,16 @@ App.use(
 // 处理跨域
 App.use(KoaCors());
 
+App.use(KoaViews(path.resolve(__dirname, '../html'), { map: { html: 'ejs' } }));
+
 App.use(baseRouter.routes());
+App.use(emailRouter.routes());
 App.use(uploadRouter.routes());
 App.use(githookRouter.routes());
+App.use(tracklogRouter.routes());
+
+// 这个必须在路由绑定之后，不然就和/的路由冲突了
+App.use(KoaStatic(path.resolve(__dirname, '../views')));
 
 /*
   *    *    *    *    *    *

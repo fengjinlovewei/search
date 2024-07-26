@@ -3,31 +3,10 @@
   "version": "0.0.0",
   "description": "",
   "scripts": {
-    "dev": "tsc -watch"
+    "dev": "tsc -watch",
+    "docs:dev": "../node_modules/.bin/vuepress dev docs",
+    "docs:build": "../node_modules/.bin/vuepress build docs"
   },
   "author": "fengjin02",
-  "license": "ISC",
-  "dependencies": {
-    "@types/koa": "^2.13.4",
-    "@types/koa-router": "^7.4.4",
-    "@babel/parser": "^7.17.0",
-    "@types/node": "^17.0.19",
-    "chalk": "4.1.2",
-    "dir-parser": "^2.1.4",
-    "ejs": "^3.1.8",
-    "inquirer": "^8.2.0",
-    "koa": "^2.13.4",
-    "koa-body": "^5.0.0",
-    "koa-router": "^11.0.1",
-    "koa-static": "^5.0.0",
-    "koa-views": "^8.0.0",
-    "koa2-cors": "^2.0.6",
-    "lodash": "^4.17.21",
-    "marked": "^4.0.12",
-    "mjml": "^4.12.0",
-    "nodemailer": "^6.7.2",
-    "open": "^8.4.0",
-    "ora": "^5.1.0",
-    "shell-quote": "^1.7.3"
-  }
+  "license": "ISC"
 }

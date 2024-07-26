@@ -1,16 +1,11 @@
 <template>
   <div id="util-box">
-    <el-input
-      placeholder="请输入相对路径或绝对路径，多个英文逗号分割"
-      v-model="search_text"
-      class="input-with-select"
-      @keyup.enter.native="getImport"
-    >
-      <template #prepend>
+    <div class="util-box-header">
+      <div>
         <el-select
           v-model="search_type"
           multiple
-          class="searc-type"
+          class="search-type"
           placeholder="请选择类型"
         >
           <el-option
@@ -21,19 +16,26 @@
           >
           </el-option>
         </el-select>
-      </template>
-      <template #append>
-        <el-button :icon="Search" @click="getImport"></el-button>
-      </template>
-    </el-input>
+      </div>
+      <el-input
+        placeholder="请输入相对路径或绝对路径，多个英文逗号分割"
+        v-model="search_text"
+        class="input-with-select"
+        @keyup.enter.native="getImport"
+      >
+        <template #append>
+          <el-button :icon="Search" @click="getImport"></el-button>
+        </template>
+      </el-input>
+    </div>
 
-    <div class="search-data-info" id="box">
+    <div class="search-data-info">
+      <HighchartsContent :options="{}"></HighchartsContent>
       <div v-for="(item, index) in importTree" :key="'importTree' + item.path">
         <h2 class="title">
           <el-tag type="danger" size="small" effect="dark">被引用</el-tag>
           {{ item.path }}
         </h2>
-
         <div>
           <!-- <File :list="item.merge" :first="true" :type="-1"></File> -->
           <el-tree
@@ -44,7 +46,6 @@
             :load="
               loadNode_isCommon({
                 id: 'treeImportData' + index,
-
                 tree: importTree,
               })
             "
@@ -53,7 +54,6 @@
             :render-after-expand="false"
           ></el-tree>
         </div>
-        <RelationMap :data="[item.merge]" :indexPath="[item.path]" />
       </div>
 
       <div v-for="(item, index) in exportTree" :key="'exportTree' + item.path">
@@ -79,7 +79,6 @@
             :render-after-expand="false"
           ></el-tree>
         </div>
-        <RelationMap :data="[item.merge]" :indexPath="[item.path]" />
       </div>
     </div>
     <!--  -->
@@ -90,11 +89,10 @@
 import axios from 'axios';
 import { ElLoading } from 'element-plus';
 import { Search } from '@element-plus/icons-vue';
-import { ref, onMounted } from 'vue';
-import _ from 'lodash';
+import { ref } from 'vue';
 import { axiosImport, axiosExport } from '@/api';
 import { loadNode_isCommon, dblclickOpenIde } from '@/util';
-import RelationMap from './RelationMap.vue';
+import HighchartsContent from '@/components/HighchartsContent.vue';
 
 const search_text = ref<string>('');
 const search_type = ref<string[]>(['0', '1']);
@@ -138,9 +136,9 @@ const getImport = async () => {
     '.interfaceCloseBox .el-loading-spinner'
   );
 
-  const div = document.createElement('span');
+  const div = document.createElement('em');
 
-  div.innerHTML = `<span class="interfaceCloseInfo">已等待 <em id="activeNumber">0</em> 秒，<a href="javascript:;" id="activeClose">去尼玛不等了</a></span>`;
+  div.innerHTML = `<span class="interfaceCloseInfo">已等待 <em id="activeNumber">0</em> 秒，<a href="javascript:;" id="activeClose">老子不想等了，放弃</a></span>`;
 
   const activeClose = div.querySelector<HTMLAnchorElement>('#activeClose');
 
@@ -180,8 +178,8 @@ const getImport = async () => {
   try {
     const [p1, p2] = await Promise.all(proList);
 
-    importTree.value = p1?.data?.tree || [];
-    exportTree.value = p2?.data?.tree || [];
+    importTree.value = p1 ? p1.data.tree : [];
+    exportTree.value = p2 ? p2.data.tree : [];
   } catch (e) {
     console.log(e);
   }

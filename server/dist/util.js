@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ProgressBar = exports.mdParse = exports.currying = exports.getType = exports.DateFormat = exports.PathMerge = exports.RunCommand = void 0;
+exports.fixedCharAt = exports.ProgressBar = exports.mdParse = exports.currying = exports.getType = exports.DateFormat = exports.PathMerge = exports.RunCommand = void 0;
 const path_1 = __importDefault(require("path"));
 const child_process_1 = require("child_process");
 // https://marked.js.org/using_pro#renderer
@@ -53,7 +53,6 @@ const PathMerge = ({ entry = [], isPath = false, }) => {
             }
             if (curItem === null) {
                 curItem = {
-                    name,
                     label: name,
                     children: [],
                 };
@@ -181,3 +180,29 @@ class ProgressBar {
     }
 }
 exports.ProgressBar = ProgressBar;
+function fixedCharAt(str, idx) {
+    var ret = '';
+    str += '';
+    var end = str.length;
+    var surrogatePairs = /[\uD800-\uDBFF][\uDC00-\uDFFF]/g;
+    while (surrogatePairs.exec(str) != null) {
+        var li = surrogatePairs.lastIndex;
+        if (li - 2 < idx) {
+            idx++;
+        }
+        else {
+            break;
+        }
+    }
+    if (idx >= end || idx < 0) {
+        return '';
+    }
+    ret += str.charAt(idx);
+    if (/[\uD800-\uDBFF]/.test(ret) &&
+        /[\uDC00-\uDFFF]/.test(str.charAt(idx + 1))) {
+        // Go one further, since one of the "characters" is part of a surrogate pair
+        ret += str.charAt(idx + 1);
+    }
+    return ret;
+}
+exports.fixedCharAt = fixedCharAt;

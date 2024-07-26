@@ -1,4 +1,1 @@
-declare interface SendGroupMsgMeishiType {
-  text: string;
-  toId?: string;
-}
+/// <reference path="../lib/index.d.ts" />

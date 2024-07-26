@@ -127,8 +127,6 @@ import { openIde } from '@/util';
 
 const store = useStore();
 
-console.log('store', store);
-
 const { core, email } = store.state;
 
 const fileList = ref<any>([]);
@@ -159,7 +157,7 @@ const form = reactive<{
   group: string[];
 }>({
   title: '',
-  user: '',
+  user: core?.coreData?.commit['%cn'],
   toUserList: '',
   group: [],
 });
@@ -322,12 +320,12 @@ const getHistory = async () => {
   const {
     toUserList = [],
     group = defaultEmailList.value,
-    title = `提测-${core?.coreData?.iworkId}`,
-    user = core?.coreData?.commit['%cn'],
+    title = '',
+    user = '',
   } = data.data;
 
-  form.title = title;
-  form.user = user;
+  form.title = `前端提测-${core.coreData.iworkId}`;
+  form.user = user || core?.coreData?.commit['%cn'] || '';
   form.toUserList = toUserList.join(',');
   form.group = group;
 
