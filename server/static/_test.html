@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>依赖分析</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <style type="text/css">
+      * {
+        margin: 0;
+        padding: 0;
+      }
+
+      #root {
+        padding: 50px;
+      }
+
+      .title {
+        padding-top: 50px;
+      }
+
+      .box1 {
+        padding-top: 30px;
+      }
+
+      .box2 {
+        padding-left: 20px;
+        font-size: 13px;
+        color: #fff;
+      }
+
+      .text {
+        padding: 5px 0;
+      }
+
+      .text-info {
+        cursor: pointer;
+      }
+
+      .text-info:hover {
+        text-decoration: underline;
+      }
+    </style>
+
+    <script>
+      try {
+        var data = $data;
+        console.log(data.tree);
+      } catch (e) {
+        var data = {};
+      }
+    </script>
+  </head>
+
+  <body>
+    <div id="root">
+      <div v-for="(item, index) in tree" :key="item.path">
+        <h2 class="title">{{index + 1}}：{{item.path}}</h2>
+        <div>
+          <File :list="item.merge" :first="true" :type="-1"></File>
+        </div>
+      </div>
+    </div>
+    <script>
+      function getRandom(min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+      }
+      var n = 0;
+
+      function getRandomColor() {
+        n++;
+        const h = n * 46;
+        const l = n % 2 ? '25' : '50';
+        const color = n % 2 ? '#fff' : '#000';
+        return {
+          backgroundColor: `hsl(${h}deg,90%,${l}%)`,
+          color,
+        };
+      }
+      const styles = Array(30)
+        .fill('')
+        .map(() => getRandomColor());
+
+      // 定义一个名为 button-counter 的新组件
+      Vue.component('File', {
+        name: 'File',
+        props: {
+          list: Object,
+          first: Boolean,
+          type: Number,
+        },
+        data: () => ({ styles }),
+        template: `<div class="box">
+          <div 
+          :class="[ first ? 'box1' : 'box2' ]" 
+          :style="styles[type]" 
+          v-for="(value, key, index) in list" 
+          :key="key">
+            <p class="text"><span class="text-info" @click="open(key)">{{key}}</span></p>
+            <File :list="value" :type="type + 1"></File>
+          </div>
+        </div>`,
+        methods: {
+          open(key) {
+            const path = `${data.root}${key}`;
+            axios
+              .get('/send', {
+                params: {
+                  path,
+                },
+              })
+              .then(function(response) {
+                console.log(response);
+              })
+              .catch(function(error) {
+                console.log(error);
+              });
+          },
+        },
+      });
+      var app = new Vue({
+        el: '#root',
+        data,
+      });
+    </script>
+  </body>
+</html>

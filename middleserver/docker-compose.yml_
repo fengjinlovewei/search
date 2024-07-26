@@ -1,0 +1,32 @@
+version: '3'
+services:
+  search-mysql:
+    # 容器名(以后的控制都通过这个)
+    container_name:
+      search-mysql
+      # 重启策略
+    restart: always
+    image: mysql:5.7
+    ports:
+      - '3306:3306'
+    volumes:
+      # 挂挂载配置文件
+      #  - ./mysql/db/:/docker-entrypoint-initdb.d
+      # 挂挂载配置文件
+      - ./mysql/conf:/etc/mysql/conf.d
+      # 挂载日志
+      - ./mysql/logs:/logs
+      # 挂载数据
+      - ./mysql/data:/var/lib/mysql
+    command:
+      [
+        'mysqld',
+        '--innodb-buffer-pool-size=80M',
+        '--character-set-server=utf8mb4',
+        '--collation-server=utf8mb4_unicode_ci',
+        '--default-time-zone=+8:00',
+        '--lower-case-table-names=1',
+      ]
+    environment:
+      # root 密码
+      MYSQL_ROOT_PASSWORD: fuckhorse

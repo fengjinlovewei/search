@@ -1,0 +1,137 @@
+#root {
+  position: relative;
+}
+.container {
+  padding: 0 50px 0;
+}
+.tab-box {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0 40px 0;
+  height: 60px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 999;
+  background-color: rgb(84, 92, 100);
+}
+.container-info {
+  height: calc(100vh - 120px);
+  overflow-y: auto;
+}
+.input-with-select {
+  padding-bottom: 20px;
+}
+.search-data-info {
+  height: calc(100vh - 200px);
+  overflow-y: auto;
+}
+.tab-pane-box {
+  padding-left: 40px;
+  height: calc(100vh - 140px);
+  overflow-y: auto;
+}
+.tab-none {
+  height: 100px;
+}
+.el-menu-demo {
+  padding: 0 0px;
+}
+.title {
+  padding: 20px 0;
+}
+.upload-box {
+  padding-bottom: 20px;
+}
+.tree-foot {
+  padding: 10px 0;
+}
+.file-tip1 {
+  color: red;
+}
+.file-tip2 {
+  color: #67c23a;
+}
+.tit {
+  padding: 30px 0;
+}
+.pages-box {
+  margin-top: 10px;
+  cursor: pointer;
+}
+.pointer {
+  cursor: pointer;
+}
+.qa-item {
+  padding-bottom: 10px;
+}
+.img-box {
+  display: flex;
+}
+.img-info {
+  width: 45%;
+  margin: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.tag-info {
+  padding: 5px 0;
+}
+.page-label {
+  min-width: 80px;
+}
+.btn-box {
+  padding-top: 20px;
+}
+.iframe-style {
+  border: 0;
+}
+.interfaceCloseInfo {
+  font-size: 14px;
+  color: #409eff;
+}
+
+.interfaceCloseInfo a {
+  font-size: 14px;
+  color: #f56c6c;
+}
+.interfaceCloseInfo em {
+  font-style: normal;
+}
+
+/*
+垃圾文件样式
+*/
+
+.tit {
+  padding: 50px 0;
+}
+.p-style {
+  display: flex;
+  font-size: 16px;
+  margin: 15px 0;
+}
+.p-style span {
+  padding-left: 20px;
+}
+.p-style span em {
+  font-style: normal;
+  color: red;
+  font-weight: bold;
+  cursor: pointer;
+  text-decoration: underline;
+}
+.p-style span i {
+  font-style: normal;
+  color: red;
+  font-weight: bold;
+}
+.scroll-box {
+  width: 100%;
+  height: 400px;
+  overflow-y: scroll;
+}
+span.el-tag {
+  cursor: pointer;
+}

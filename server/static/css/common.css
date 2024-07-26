@@ -1,0 +1,53 @@
+body {
+  margin: 0;
+  padding: 0;
+}
+.project-name-box {
+  opacity: 1 !important;
+}
+.project-name {
+  height: 100%;
+  flex-direction: column;
+  display: flex;
+  color: #ffd04b !important;
+  justify-content: center;
+  font-size: 16px !important;
+  font-weight: 500;
+  padding-right: 40px;
+  cursor: default;
+}
+.project-name span {
+  line-height: 20px;
+}
+div.el-dialog__body {
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+span.el-tree-node__label {
+  font-size: 16px;
+}
+div.el-tree-node__content {
+  height: 32px;
+}
+div.el-collapse-item__header {
+  font-size: 18px;
+}
+span.el-tag {
+  font-size: 16px;
+}
+.tab-box .el-menu-item {
+  font-size: 20px;
+}
+
+.el-menu--horizontal > .el-menu-item.is-active {
+  font-weight: 600;
+}
+
+div.el-collapse-item__content {
+  font-size: 16px;
+}
+
+.searc-type {
+  width: 200px;
+}

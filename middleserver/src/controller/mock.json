@@ -1,0 +1,140 @@
+{
+    "object_kind": "merge_request",
+    "event_type": "merge_request",
+    "user": {
+        "id": 16805,
+        "name": "冯劲",
+        "username": "fengjin02",
+        "avatar_url": "https://seccdn.libravatar.org/avatar/3fb2c4e08b91299f0fbbaf7eabb1a037?s=80&d=identicon",
+        "email": "fengjin02@58.com"
+    },
+    "project": {
+        "id": 71618,
+        "name": "search",
+        "description": "一个项目依赖分析工具",
+        "web_url": "https://igit.58corp.com/fengjin02/search",
+        "avatar_url": null,
+        "git_ssh_url": "git@igit.58corp.com:fengjin02/search.git",
+        "git_http_url": "https://igit.58corp.com/fengjin02/search.git",
+        "namespace": "fengjin02",
+        "visibility_level": 20,
+        "path_with_namespace": "fengjin02/search",
+        "default_branch": "master",
+        "ci_config_path": "",
+        "homepage": "https://igit.58corp.com/fengjin02/search",
+        "url": "git@igit.58corp.com:fengjin02/search.git",
+        "ssh_url": "git@igit.58corp.com:fengjin02/search.git",
+        "http_url": "https://igit.58corp.com/fengjin02/search.git"
+    },
+    "object_attributes": {
+        "assignee_id": 16805,
+        "author_id": 16805,
+        "created_at": "2022-04-15 14:24:47 +0800",
+        "description": "Closes #1",
+        "head_pipeline_id": null,
+        "id": 1572967,
+        "iid": 1,
+        "last_edited_at": "2022-04-15 15:44:21 +0800",
+        "last_edited_by_id": 16805,
+        "merge_commit_sha": "cece7292e5ae7084342620af08d97747ec6f61e8",
+        "merge_error": null,
+        "merge_params": {
+            "force_remove_source_branch": true
+        },
+        "merge_status": "can_be_merged",
+        "merge_user_id": null,
+        "merge_when_pipeline_succeeds": false,
+        "milestone_id": null,
+        "source_branch": "test-222222",
+        "source_project_id": 71618,
+        "state_id": 3,
+        "target_branch": "master",
+        "target_project_id": 71618,
+        "time_estimate": 0,
+        "title": "Resolve \"heheeh\"",
+        "updated_at": "2022-04-15 15:50:19 +0800",
+        "updated_by_id": 16805,
+        "url": "https://igit.58corp.com/fengjin02/search/-/merge_requests/1",
+        "source": {
+            "id": 71618,
+            "name": "search",
+            "description": "一个项目依赖分析工具",
+            "web_url": "https://igit.58corp.com/fengjin02/search",
+            "avatar_url": null,
+            "git_ssh_url": "git@igit.58corp.com:fengjin02/search.git",
+            "git_http_url": "https://igit.58corp.com/fengjin02/search.git",
+            "namespace": "fengjin02",
+            "visibility_level": 20,
+            "path_with_namespace": "fengjin02/search",
+            "default_branch": "master",
+            "ci_config_path": "",
+            "homepage": "https://igit.58corp.com/fengjin02/search",
+            "url": "git@igit.58corp.com:fengjin02/search.git",
+            "ssh_url": "git@igit.58corp.com:fengjin02/search.git",
+            "http_url": "https://igit.58corp.com/fengjin02/search.git"
+        },
+        "target": {
+            "id": 71618,
+            "name": "search",
+            "description": "一个项目依赖分析工具",
+            "web_url": "https://igit.58corp.com/fengjin02/search",
+            "avatar_url": null,
+            "git_ssh_url": "git@igit.58corp.com:fengjin02/search.git",
+            "git_http_url": "https://igit.58corp.com/fengjin02/search.git",
+            "namespace": "fengjin02",
+            "visibility_level": 20,
+            "path_with_namespace": "fengjin02/search",
+            "default_branch": "master",
+            "ci_config_path": "",
+            "homepage": "https://igit.58corp.com/fengjin02/search",
+            "url": "git@igit.58corp.com:fengjin02/search.git",
+            "ssh_url": "git@igit.58corp.com:fengjin02/search.git",
+            "http_url": "https://igit.58corp.com/fengjin02/search.git"
+        },
+        "last_commit": {
+            "id": "b38f8a5b2f7363d2a5ea2e72a18151a63c953679",
+            "message": "style: 测试11\\n",
+            "title": "style: 测试11",
+            "timestamp": "2022-04-15T14:50:36+08:00",
+            "url": "https://igit.58corp.com/fengjin02/search/-/commit/b38f8a5b2f7363d2a5ea2e72a18151a63c953679",
+            "author": [
+                null
+            ]
+        },
+        "work_in_progress": false,
+        "total_time_spent": 0,
+        "human_total_time_spent": null,
+        "human_time_estimate": null,
+        "assignee_ids": [
+            16805
+        ],
+        "state": "merged",
+        "action": "merge"
+    },
+    "labels": [],
+    "changes": {
+        "state_id": {
+            "previous": 4,
+            "current": 3
+        },
+        "updated_at": {
+            "previous": "2022-04-15 15:50:19 +0800",
+            "current": "2022-04-15 15:50:19 +0800"
+        }
+    },
+    "repository": {
+        "name": "search",
+        "url": "git@igit.58corp.com:fengjin02/search.git",
+        "description": "一个项目依赖分析工具",
+        "homepage": "https://igit.58corp.com/fengjin02/search"
+    },
+    "assignees": [
+        {
+            "id": 16805,
+            "name": "冯劲",
+            "username": "fengjin02",
+            "avatar_url": "https://seccdn.libravatar.org/avatar/3fb2c4e08b91299f0fbbaf7eabb1a037?s=80&d=identicon",
+            "email": "fengjin02@58.com"
+        }
+    ]
+}
